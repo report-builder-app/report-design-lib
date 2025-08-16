@@ -1,0 +1,79 @@
+package com.report_design_lib
+
+report("CustomerReport") {
+    // Общие параметры отчёта
+    title = "Customer List"
+    pageFormat = PageFormat.A4
+    orientation = PageOrientation.PORTRAIT
+
+    // Параметры отчёта
+    parameters {
+        param("ReportTitle", String, "Customer List")
+        param("StartDate", Date)
+        param("EndDate", Date)
+    }
+
+    // Поля (получаемые из запроса или источника данных)
+    fields {
+        field("customerId", Long)
+        field("firstName", String)
+        field("lastName", String)
+        field("email", String)
+        field("totalPurchases", BigDecimal)
+    }
+
+    // Запрос данных
+    queryString("""
+        SELECT c.id as customerId, c.first_name as firstName, 
+               c.last_name as lastName, c.email, 
+               SUM(o.total) as totalPurchases
+        FROM customers c
+        JOIN orders o ON c.id = o.customer_id
+        WHERE o.order_date BETWEEN \$P{StartDate} AND \$P{EndDate}
+        GROUP BY c.id, c.first_name, c.last_name, c.email
+    """)
+
+    // Стили
+    styles {
+        style("titleStyle") {
+            font {
+                size = 18
+                isBold = true
+            }
+            horizontalAlignment = Alignment.CENTER
+        }
+
+        style("columnHeader") {
+            font {
+                isBold = true
+            }
+            background = Color.LIGHT_GRAY
+        }
+    }
+
+    // Структура отчёта
+    bands {
+        titleBand {
+            label(text: "\$P{ReportTitle}", style: "titleStyle")
+        }
+
+        columnHeader {
+            label(text: "ID", width: 50)
+            label(text: "Name", width: 150)
+            label(text: "Email", width: 200)
+            label(text: "Total", width: 100)
+        }
+
+        detail {
+            textField(expression: "\$F{customerId}", width: 50)
+            textField(expression: "\$F{firstName} + ' ' + \$F{lastName}", width: 150)
+            textField(expression: "\$F{email}", width: 200)
+            textField(expression: "\$F{totalPurchases}", width: 100)
+        }
+
+        summary {
+            line(y: 0)
+            textField(expression: "Total customers: " + "\$V{REPORT_COUNT}")
+        }
+    }
+}
