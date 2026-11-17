@@ -11,6 +11,10 @@
     <modules>
         <module>report-design-core</module>
         <module>mongo-datasource-extension</module>
+        <module>report-design-renderer-pdf</module>
+        <module>report-design-renderer-xls</module>
+        <module>report-design-renderer-html</module>
+        <module>report-design-renderer-json</module>
     </modules>
 
     <properties>

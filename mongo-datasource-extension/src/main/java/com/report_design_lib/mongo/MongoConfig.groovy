@@ -1,4 +1,4 @@
-package com.report_design.mongo
+package com.report_design_lib.mongo
 
 import com.report_design_lib.interfaces.DataSourceConfig
 
