@@ -58,21 +58,21 @@ core ← renderer-pdf
 
 ```xml
 <dependency>
-    <groupId>com.report_design</groupId>
+    <groupId>com.report_design_libcom.report_design_lib</groupId>
     <artifactId>report-design-core</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 
-<!-- нужные рендереры -->
+        <!-- нужные рендереры -->
 <dependency>
-    <groupId>com.report_design</groupId>
-    <artifactId>report-design-renderer-pdf</artifactId>
-    <version>1.0-SNAPSHOT</version>
+<groupId>com.report_design_libcom.report_design_lib</groupId>
+<artifactId>report-design-renderer-pdf</artifactId>
+<version>1.0-SNAPSHOT</version>
 </dependency>
 <dependency>
-    <groupId>com.report_design</groupId>
-    <artifactId>report-design-renderer-html</artifactId>
-    <version>1.0-SNAPSHOT</version>
+<groupId>com.report_design_libcom.report_design_lib</groupId>
+<artifactId>report-design-renderer-html</artifactId>
+<version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 

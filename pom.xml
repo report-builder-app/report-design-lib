@@ -15,6 +15,7 @@
         <module>report-design-renderer-xls</module>
         <module>report-design-renderer-html</module>
         <module>report-design-renderer-json</module>
+        <module>report-design-dynamicreports</module>
     </modules>
 
     <properties>
