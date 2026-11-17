@@ -165,7 +165,7 @@ ReportDsl.report("CustomerReport") {
 }
 ```
 
-### Секции
+## Секции
 
 | Секция | Методы | Назначение |
 |---|---|---|
@@ -178,6 +178,32 @@ ReportDsl.report("CustomerReport") {
 | `styles { }` | `style(name) { font { ... }; ... }` | Стили |
 | `bands { }` | `titleBand`, `columnHeader`, `detail`, `summary` | Полосы отчёта |
 | `dataSource { }` | `sql`, `web`, `custom` | Источник данных |
+
+### Подотчёты
+
+В любой бэнд можно вложить другой отчёт:
+
+```groovy
+bands {
+    detail {
+        textField(expression: "\$F{orderId}", width: 100f)
+        subreport {
+            report("OrderItems") {
+                queryString "SELECT * FROM order_items WHERE order_id = \$P{orderId}"
+                dataSource { sql { jdbcUrl "..." } }
+                fields { field("product", String) }
+                bands { detail { textField(expression: "\$F{product}", width: 200f) } }
+            }
+            inheritData(true)   // параметры текущей строки родителя
+            width 400f
+        }
+    }
+}
+```
+
+Подотчёт разворачивается в плоский список строк на этапе `ReportFlattener`, поэтому его поддерживают все рендереры без изменений в модели. Циклические ссылки (A → B → A) обнаруживаются при разворачивании и бросают `IllegalStateException`
+
+Подотчёты добавляются **в core** и не требуют изменений в рендерерах: `SubreportElement` — обычный `ReportElement`, а `ReportFlattener` разворачивает его в вложенные `subRows`. DSL получает метод `subreport { ... }`, через который можно вложить другой DSL-отчёт (`report("Name") { ... }`), готовый `Report` или ленивый поставщик (`lazy { ... }`). Параметры подотчёта — явные (`param("k", v)`) плюс опциональный проброс данных родителя (`inheritData(true)`). Защита от рекурсии реализуется на этапе flatten, поэтому цикл A → B → A диагностируется понятным исключением, а не `StackOverflowError`.
 
 ### Элементы внутри band'ов
 Любой band поддерживает единый API:
@@ -196,14 +222,14 @@ summary {
 
 Общие поля всех элементов: x, y, width, height, style.
 
-### Выражения
+## Выражения
 - `$F{field}` — значение поля из текущей строки источника данных.
 - `$P{param}` — значение параметра отчёта.
 - `$V{...}` — системные переменные (например, REPORT_COUNT).
 
 Всё остальное возвращается как литерал (для HTML/JSON-рендереров).
 
-### Источники данных
+## Источники данных
 
 Все источники реализуют SPI `DataSourceProvider<C extends DataSourceConfig>`.
 

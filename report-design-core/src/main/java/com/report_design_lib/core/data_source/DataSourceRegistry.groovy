@@ -21,4 +21,9 @@ class DataSourceRegistry {
     }
 
     static List<String> available() { providers.keySet().toList() }
+
+    /**
+     * Очистить реестр. Нужно для тестов и переинициализации.
+     */
+    static void clear() { providers.clear() }
 }

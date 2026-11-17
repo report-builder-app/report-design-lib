@@ -1,6 +1,6 @@
 package com.report_design_lib.core
 
-import com.report_design_lib.core.elements.Bands
+import com.report_design_lib.core.elements.bands.Bands
 import com.report_design_lib.core.elements.Fields
 import com.report_design_lib.core.elements.PageFormat
 import com.report_design_lib.core.elements.PageOrientation

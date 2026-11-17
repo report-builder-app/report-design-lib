@@ -3,6 +3,11 @@ package com.report_design_lib.dynamic
 import com.report_design_lib.core.RendererRegistry
 import com.report_design_lib.core.Report
 import com.report_design_lib.core.elements.*
+import com.report_design_lib.core.elements.bands.Bands
+import com.report_design_lib.core.elements.bands.ColumnHeaderBand
+import com.report_design_lib.core.elements.bands.DetailBand
+import com.report_design_lib.core.elements.bands.SummaryBand
+import com.report_design_lib.core.elements.bands.TitleBand
 import com.report_design_lib.interfaces.DataSourceConfig
 
 class FluentReportBuilder {

@@ -1,4 +1,6 @@
-package com.report_design_lib.core.elements
+package com.report_design_lib.core.elements.bands
+
+import com.report_design_lib.core.elements.BandType
 
 class Bands {
     TitleBand titleBand

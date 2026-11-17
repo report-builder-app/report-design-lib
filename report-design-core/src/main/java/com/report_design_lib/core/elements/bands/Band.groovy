@@ -1,4 +1,10 @@
-package com.report_design_lib.core.elements
+package com.report_design_lib.core.elements.bands
+
+import com.report_design_lib.core.elements.BandType
+import com.report_design_lib.core.elements.Label
+import com.report_design_lib.core.elements.Line
+import com.report_design_lib.core.elements.ReportElement
+import com.report_design_lib.core.elements.TextField
 
 abstract class Band {
     abstract BandType getType()
@@ -36,4 +42,13 @@ abstract class Band {
     int size() { elements.size() }
     boolean isEmpty() { elements.isEmpty() }
     List<ReportElement> getList() { Collections.unmodifiableList(elements) }
+
+    Band subreport(@DelegatesTo(SubreportBuilder) Closure cl) {
+        def b = new SubreportBuilder()
+        cl.delegate = b
+        cl.resolveStrategy = Closure.DELEGATE_FIRST
+        cl()
+        add(b.build())
+        this
+    }
 }
