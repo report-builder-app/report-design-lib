@@ -372,6 +372,11 @@ report-design-core/src/test/groovy/
 
 Apache License 2.0 — см. файл LICENSE
 
+JasperReports® and JRXML are trademarks or registered trademarks of Cloud Software Group, Inc.
+or its subsidiaries (formerly TIBCO Software Inc. / Jaspersoft Corporation).
+This project is an independent converter tool and is not affiliated with, endorsed by,
+or sponsored by Cloud Software Group, Inc.
+
 ## Контрибьютинг
 
 1. Форкните репозиторий.
