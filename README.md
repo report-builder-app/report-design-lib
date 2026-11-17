@@ -1,5 +1,12 @@
 # report-design-lib
 
+[![CI](https://github.com/report-builder-app/report-design-lib/actions/workflows/publish.yml/badge.svg)](https://github.com/report-builder-app/report-design-lib/actions/workflows/publish.yml)
+[![GitHub release](https://img.shields.io/github/v/release/report-builder-app/report-design-lib?sort=semver&label=release)](https://github.com/report-builder-app/report-design-lib/releases)
+[![Maven Central](https://img.shields.io/badge/packages-GitHub-blue?logo=github)](https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Groovy](https://img.shields.io/badge/Groovy-4.0.31-4298b8?logo=apachegroovy)](https://groovy-lang.org/)
+[![JDK](https://img.shields.io/badge/JDK-17%2B-orange)](https://adoptium.net/)
+
 DSL для описания отчётов на Groovy с подключаемыми источниками данных и сменными рендерерами (PDF, XLSX, HTML, JSON).
 
 Идея: один раз описать отчёт в декларативном Groovy-DSL — и рендерить его в любой поддерживаемый формат, не меняя модель. Ядро ничего не знает про конкретный рендер или СУБД: всё подключается как отдельные Maven-модули.
@@ -140,6 +147,14 @@ Reports.renderToFile(report, 'json', [:])
 - **Maven-репозиторий:** `https://maven.pkg.github.com/report-builder-app/report-design-lib`
 
 Публикация выполняется автоматически при пуше тега `v*` (см. `.github/workflows/publish.yml`).
+
+| Модуль | Версия | Назначение |
+|---|---|---|
+| `report-design-core` | ![core](https://img.shields.io/badge/core-1.0.0-blue) | Модель, DSL, SPI |
+| `report-design-renderer-pdf` | ![pdf](https://img.shields.io/badge/pdf-1.0.0-red) | PDF (OpenPDF) |
+| `report-design-renderer-xls` | ![xls](https://img.shields.io/badge/xls-1.0.0-green) | XLSX (POI) |
+| `report-design-renderer-html` | ![html](https://img.shields.io/badge/html-1.0.0-yellow) | HTML |
+| `report-design-renderer-json` | ![json](https://img.shields.io/badge/json-1.0.0-lightgrey) | JSON |
 
 ### Подключение пакетов
 
