@@ -29,16 +29,43 @@ DSL для описания отчётов на Groovy с подключаемы
 | `report-design-renderer-xls` | Рендеринг в XLSX | Apache POI |
 | `report-design-renderer-html` | Рендеринг в HTML | — |
 | `report-design-renderer-json` | Рендеринг в JSON | groovy-json |
-| `report-design-testkit` *(опционально)* | Тестовые провайдеры и утилиты | Groovy, Spock |
+| `report-design-jasper-to-dsl` | Конвертер JRXML → Groovy DSL (CLI + библиотека) | Groovy 4, groovy-xml |
+  | `report-design-dynamicreport` | Fluent-фасад в стиле DynamicReports над core | report-design-core |
+ | `report-design-testkit` *(опционально)* | Тестовые провайдеры и утилиты | Groovy, Spock |
 
 Зависимости между модулями:
-core ← renderer-pdf
-← renderer-xls
-← renderer-html
-← renderer-json
-← testkit
+```
+                    ┌──────────────────────────┐
+                    │    report-design-core    │
+                    │  модель, DSL, SPI        │
+                    └────────────┬─────────────┘
+                                 │
+     ┌──────────────┬────────────┼────────────┬──────────────┐
+     │              │            │            │              │
+     ▼              ▼            ▼            ▼              ▼
+┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────────┐
+│renderer- │ │renderer- │ │renderer- │ │renderer- │ │dynamicreports      │
+│pdf       │ │xls       │ │html      │ │json      │ │(fluent-фасад)      │
+│(OpenPDF) │ │(POI)     │ │(—)       │ │(—)       │ │                    │
+└──────────┘ └──────────┘ └──────────┘ └──────────┘ └────────────────────┘
 
-`core` не зависит ни от OpenPDF, ни от POI, ни от какого-либо рендерера.
+┌────────────────────────────┐         ┌──────────────────────────┐
+│report-design-jasper-to-dsl │         │report-design-testkit     │
+│(не зависит от core;        │         │(test scope)              │
+│ нужен только groovy-xml)   │         └────────────┬─────────────┘
+└────────────────────────────┘                      │
+                                                    ▼ (используется в тестах)
+                                          core / renderer-* / dynamicreports
+```
+
+### Принципы
+
+- `core` не зависит ни от OpenPDF, ни от POI, ни от какого-либо рендерера. Это позволяет тестировать модель и DSL без тяжёлых PDF/Excel-библиотек.
+- Каждый рендерер — отдельный модуль. Приложение подключает только те, что ему нужны. `renderer-html` и `renderer-json `не тянут внешних зависимостей; renderer-pdf тянет OpenPDF, renderer-xls — Apache POI.
+- `renderer-*` зависит от core, но не наоборот. core предоставляет интерфейс `ReportRenderer` и `RendererRegistry`; реализации находятся в модулях.
+- `report-design-jasper-to-dsl` не зависит от core — конвертер генерирует текст Groovy-DSL и не строит объекты модели. Это позволяет запускать его как автономную утилиту.
+- `report-design-dynamicreports` зависит только от core — предоставляет fluent-фасад над тем же Report. Рендеринг — через тот же RendererRegistry.
+- `report-design-testkit` — опциональный модуль только для test scope. Содержит `StaticProvider`, `InMemoryProvider`, `FakeRenderer` и другие утилиты, общие для тестов всех модулей.
 
 ---
 
@@ -65,14 +92,14 @@ core ← renderer-pdf
 
         <!-- нужные рендереры -->
 <dependency>
-<groupId>com.report_design_libcom.report_design_lib</groupId>
-<artifactId>report-design-renderer-pdf</artifactId>
-<version>1.0-SNAPSHOT</version>
+    <groupId>com.report_design_libcom.report_design_lib</groupId>
+    <artifactId>report-design-renderer-pdf</artifactId>
+    <version>1.0-SNAPSHOT</version>
 </dependency>
 <dependency>
-<groupId>com.report_design_libcom.report_design_lib</groupId>
-<artifactId>report-design-renderer-html</artifactId>
-<version>1.0-SNAPSHOT</version>
+    <groupId>com.report_design_libcom.report_design_lib</groupId>
+    <artifactId>report-design-renderer-html</artifactId>
+    <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
