@@ -130,6 +130,60 @@ Reports.renderToFile(report, 'html', [:])
 Reports.renderToFile(report, 'json', [:])
 ```
 
+## Публикация и релизы
+
+### GitHub Packages
+
+Все модули публикуются в GitHub Packages организации `report-builder-app`:
+
+- **Страница пакетов:** https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib
+- **Maven-репозиторий:** `https://maven.pkg.github.com/report-builder-app/report-design-lib`
+
+Публикация выполняется автоматически при пуше тега `v*` (см. `.github/workflows/publish.yml`).
+
+### Подключение пакетов
+
+Добавьте репозиторий и зависимость в `pom.xml` приложения:
+
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/report-builder-app/report-design-lib</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.report_design</groupId>
+        <artifactId>report-design-core</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.report_design</groupId>
+        <artifactId>report-design-renderer-pdf</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+</dependencies>
+```
+
+Для разрешения зависимостей нужен Personal Access Token (PAT) с правом read:packages. Добавьте сервер в `~/.m2/settings.xml`:
+
+```xml
+<settings>
+    <servers>
+        <server>
+            <id>github</id>
+            <username>YOUR_GITHUB_USERNAME</username>
+            <password>YOUR_PERSONAL_ACCESS_TOKEN</password>
+        </server>
+    </servers>
+</settings>
+```
+id в settings.xml (github) должен совпадать с id репозитория в pom.xml
+
 ## DSL: описание отчёта
 
 Точка входа — ReportDsl.report(name) { ... }. Внутри доступны секции:
