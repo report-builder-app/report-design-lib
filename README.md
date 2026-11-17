@@ -141,6 +141,9 @@ Reports.renderToFile(report, 'json', [:])
 
 ### GitHub Packages
 
+[![packages](https://img.shields.io/badge/packages-GitHub-blue?logo=github)](https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib)
+[![release](https://img.shields.io/github/v/release/report-builder-app/report-design-lib?sort=semver&label=latest%20release)](https://github.com/report-builder-app/report-design-lib/releases)
+
 Все модули публикуются в GitHub Packages организации `report-builder-app`:
 
 - **Страница пакетов:** https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib
@@ -148,14 +151,19 @@ Reports.renderToFile(report, 'json', [:])
 
 Публикация выполняется автоматически при пуше тега `v*` (см. `.github/workflows/publish.yml`).
 
-| Модуль | Версия | Назначение |
-|---|---|---|
-| `report-design-core` | ![core](https://img.shields.io/badge/core-1.0.0-blue) | Модель, DSL, SPI |
-| `report-design-renderer-pdf` | ![pdf](https://img.shields.io/badge/pdf-1.0.0-red) | PDF (OpenPDF) |
-| `report-design-renderer-xls` | ![xls](https://img.shields.io/badge/xls-1.0.0-green) | XLSX (POI) |
-| `report-design-renderer-html` | ![html](https://img.shields.io/badge/html-1.0.0-yellow) | HTML |
-| `report-design-renderer-json` | ![json](https://img.shields.io/badge/json-1.0.0-lightgrey) | JSON |
+### Доступные модули и артефакты
 
+| Модуль | Артефакт |
+|---|---|
+| `report-design-core` | `com.report_design:report-design-core` |
+| `report-design-renderer-pdf` | `com.report_design:report-design-renderer-pdf` |
+| `report-design-renderer-xls` | `com.report_design:report-design-renderer-xls` |
+| `report-design-renderer-html` | `com.report_design:report-design-renderer-html` |
+| `report-design-renderer-json` | `com.report_design:report-design-renderer-json` |
+| `report-design-jasper-to-dsl` | `com.report_design:report-design-jasper-to-dsl` |
+| `report-design-dynamicreports` | `com.report_design:report-design-dynamicreports` |
+
+Список версий — на странице пакетов: https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib
 ### Подключение пакетов
 
 Добавьте репозиторий и зависимость в `pom.xml` приложения:
