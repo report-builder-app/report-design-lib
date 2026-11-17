@@ -153,17 +153,18 @@ Reports.renderToFile(report, 'json', [:])
 
 ### Доступные модули и артефакты
 
-| Модуль | Артефакт |
-|---|---|
-| `report-design-core` | `com.report_design:report-design-core` |
-| `report-design-renderer-pdf` | `com.report_design:report-design-renderer-pdf` |
-| `report-design-renderer-xls` | `com.report_design:report-design-renderer-xls` |
-| `report-design-renderer-html` | `com.report_design:report-design-renderer-html` |
-| `report-design-renderer-json` | `com.report_design:report-design-renderer-json` |
-| `report-design-jasper-to-dsl` | `com.report_design:report-design-jasper-to-dsl` |
-| `report-design-dynamicreports` | `com.report_design:report-design-dynamicreports` |
+| Модуль  | Версия | Артефакт |
+|---|---|---|
+| `report-design-core`  | ![core](https://img.shields.io/badge/core-1.0.0-blue) | `com.report_design:report-design-core` |
+| `report-design-renderer-pdf` | ![pdf](https://img.shields.io/badge/pdf-1.0.0-red) | `com.report_design:report-design-renderer-pdf` |
+| `report-design-renderer-xls` | ![xls](https://img.shields.io/badge/pdf-1.0.0-red) | `com.report_design:report-design-renderer-xls` |
+| `report-design-renderer-html` | ![html](https://img.shields.io/badge/pdf-1.0.0-red) | `com.report_design:report-design-renderer-html` |
+| `report-design-renderer-json` | ![json](https://img.shields.io/badge/pdf-1.0.0-red) | `com.report_design:report-design-renderer-json` |
+| `report-design-jasper-to-dsl`  | ![converter](https://img.shields.io/badge/xls-1.0.0-green) | `com.report_design:report-design-jasper-to-dsl` |
+| `report-design-dynamicreports`  | ![dynamicreports](https://img.shields.io/badge/html-1.0.0-yellow) | `com.report_design:report-design-dynamicreports` |
 
 Список версий — на странице пакетов: https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib
+
 ### Подключение пакетов
 
 Добавьте репозиторий и зависимость в `pom.xml` приложения:
