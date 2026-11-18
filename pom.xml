@@ -6,7 +6,7 @@
 
     <groupId>com.report_design</groupId>
     <artifactId>report-design-lib</artifactId>
-    <version>0.1</version>
+    <version>0.1.1</version>
     <packaging>pom</packaging>
     <modules>
         <module>report-design-core</module>
