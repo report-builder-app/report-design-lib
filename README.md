@@ -94,19 +94,19 @@ DSL для описания отчётов на Groovy с подключаемы
 <dependency>
     <groupId>com.report_design_libcom.report_design_lib</groupId>
     <artifactId>report-design-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.2</version>
 </dependency>
 
         <!-- нужные рендереры -->
 <dependency>
     <groupId>com.report_design_libcom.report_design_lib</groupId>
     <artifactId>report-design-renderer-pdf</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.2</version>
 </dependency>
 <dependency>
     <groupId>com.report_design_libcom.report_design_lib</groupId>
     <artifactId>report-design-renderer-html</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
@@ -183,12 +183,12 @@ Reports.renderToFile(report, 'json', [:])
     <dependency>
         <groupId>com.report_design</groupId>
         <artifactId>report-design-core</artifactId>
-        <version>1.0.0</version>
+        <version>0.1.2</version>
     </dependency>
     <dependency>
         <groupId>com.report_design</groupId>
         <artifactId>report-design-renderer-pdf</artifactId>
-        <version>1.0.0</version>
+        <version>0.1.2</version>
     </dependency>
 </dependencies>
 ```
