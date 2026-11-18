@@ -1,5 +1,7 @@
 # report-design-lib
 
+**Декларативный DSL для отчётов на Groovy: опишите один раз — рендерите в PDF, XLSX, HTML и JSON.**
+
 [![CI](https://github.com/report-builder-app/report-design-lib/actions/workflows/publish.yml/badge.svg)](https://github.com/report-builder-app/report-design-lib/actions/workflows/publish.yml)
 [![GitHub release](https://img.shields.io/github/v/release/report-builder-app/report-design-lib?sort=semver&label=release)](https://github.com/report-builder-app/report-design-lib/releases)
 [![Maven Central](https://img.shields.io/badge/packages-GitHub-blue?logo=github)](https://github.com/orgs/report-builder-app/packages?repo_name=report-design-lib)
@@ -7,9 +9,199 @@
 [![Groovy](https://img.shields.io/badge/Groovy-4.0.31-4298b8?logo=apachegroovy)](https://groovy-lang.org/)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-orange)](https://adoptium.net/)
 
-DSL для описания отчётов на Groovy с подключаемыми источниками данных и сменными рендерерами (PDF, XLSX, HTML, JSON).
+## Зачем это нужно
 
-Идея: один раз описать отчёт в декларативном Groovy-DSL — и рендерить его в любой поддерживаемый формат, не меняя модель. Ядро ничего не знает про конкретный рендер или СУБД: всё подключается как отдельные Maven-модули.
+Классические генераторы отчётов (JasperReports, BIRT, Pentaho) требуют визуального дизайнера, XML-шаблонов и тесной привязки к конкретному движку. В результате:
+
+- **шаблоны** живут отдельно от кода и не проходят code review;
+- **формат вывода** (PDF, Excel, HTML) определяется библиотекой, а не задачей;
+- **источник данных** (БД, REST, Mongo) зашит в движок и плохо расширяется;
+- **тестирование** отчёта требует запуска всего рендерера.
+
+`report-design-lib` решает эти проблемы:
+
+| Проблема | Решение |
+|---|---|
+| Шаблоны в XML | **Groovy DSL** — тот же язык, что и бизнес-логика |
+| Один формат | **Сменные рендереры** (PDF, XLSX, HTML, JSON) — один отчёт, любой вывод |
+| Привязка к СУБД | **SPI источников данных** — SQL, REST, Mongo, свой провайдер |
+| Сложно тестировать | **Модель без рендерера** — тесты без OpenPDF и POI |
+| Монолитная библиотека | **Модули** — подключаете только то, что нужно |
+
+---
+
+## Идея
+
+**Один раз опишите отчёт в декларативном Groovy-DSL — и рендерите его в любой поддерживаемый формат, не меняя модель.**
+
+```groovy
+def report = ReportDsl.report("CustomerReport") {
+    title "Customers"
+
+    parameters {
+        param("StartDate", Date)
+        param("EndDate", Date)
+    }
+
+    fields {
+        field("id", Long)
+        field("name", String)
+        field("email", String)
+    }
+
+    queryString """
+        SELECT id, name, email
+        FROM customers
+        WHERE created_at BETWEEN \$P{StartDate} AND \$P{EndDate}
+    """
+
+    bands {
+        titleBand    { label(text: "Customers", style: "title", width: 500f) }
+        columnHeader {
+            label(text: "ID",    width: 50f)
+            label(text: "Name",  width: 200f)
+            label(text: "Email", width: 250f)
+        }
+        detail {
+            textField(expression: "\$F{id}",    width: 50f)
+            textField(expression: "\$F{name}",  width: 200f)
+            textField(expression: "\$F{email}", width: 250f)
+        }
+        summary {
+            line(y: 0f, width: 500f)
+            textField(expression: "\$V{REPORT_COUNT}", width: 100f)
+        }
+    }
+
+    dataSource {
+        sql {
+            jdbcUrl "jdbc:postgresql://localhost:5432/mydb"
+            user "report_user"
+            password "secret"
+        }
+    }
+}
+
+// Один отчёт — четыре формата:
+Reports.renderToFile(report, 'pdf',  [StartDate: from, EndDate: to])
+Reports.renderToFile(report, 'xls',  [StartDate: from, EndDate: to])
+Reports.renderToFile(report, 'html', [StartDate: from, EndDate: to])
+Reports.renderToFile(report, 'json', [StartDate: from, EndDate: to])
+```
+
+Ядро ничего не знает ни про конкретный рендер, ни про СУБД. Всё подключается как отдельные Maven-модули через SPI:
+- Рендерер — реализация ReportRenderer в модуле report-design-renderer-*.
+- Источник данных — реализация DataSourceProvider<C> в модуле-расширении.
+- Новый рендер (docx, markdown, CSV) — новый модуль, core не меняется.
+
+### 🧩 Сменные рендереры
+
+Один и тот же `Report` рендерится в:
+
+| Формат | Модуль | Зависимость | Изображения |
+|---|---|---|---|
+| **PDF** | `report-design-renderer-pdf` | OpenPDF | ✅ Поддерживаются (встраивание) |
+| **XLSX** | `report-design-renderer-xls` | Apache POI | ✅ Поддерживаются (встраивание) |
+| **HTML** | `report-design-renderer-html` | — | ✅ Поддерживаются (`<img src="...">` / base64) |
+| **JSON** | `report-design-renderer-json` | groovy-json | ✅ Поддерживаются (как URL или base64) |
+
+Рендереры находятся автоматически через `ServiceLoader` или регистрируются явно. Достаточно подключить нужный модуль — и `RendererRegistry.get('pdf')` уже работает.
+
+### 🔌 Подключаемые источники данных
+
+- **SQL** — встроенный `sql { jdbcUrl ... }`, `queryString` с `$P{...}`.
+- **Web/REST** — встроенный `web { url ...; jsonPath '$.data[*]' }`.
+- **MongoDB** — отдельный модуль `mongo-datasource-extension`.
+- **Свой источник** — реализуйте `DataSourceProvider<CustomConfig>` и зарегистрируйте в `DataSourceRegistry`.
+
+```groovy
+// SQL
+dataSource { sql { jdbcUrl "jdbc:..." } }
+
+// REST → JSON
+dataSource { web { url "https://api/orders"; jsonPath '$.data[*]' } }
+
+// MongoDB (отдельный модуль)
+dataSource {
+    custom('mongodb') {
+        option 'uri', 'mongodb://localhost:27017'
+        option 'database', 'shop'
+        option 'collection', 'orders'
+    }
+}
+```
+
+### 🪆 Подотчёты
+
+Вложенные отчёты с передачей параметров, наследованием данных текущей строки и ленивыми поставщиками:
+
+```groovy
+detail {
+    textField(expression: "\$F{orderId}", width: 100f)
+    subreport {
+        report("OrderItems") {
+            queryString "SELECT * FROM order_items WHERE order_id = \$P{orderId}"
+            dataSource { sql { jdbcUrl "..." } }
+            bands { detail { textField(expression: "\$F{product}", width: 200f) } }
+        }
+        inheritData(true)     // orderId из текущей строки
+    }
+}
+```
+Циклические ссылки (A → B → A) обнаруживаются при разворачивании и бросают `IllegalStateException` вместо `StackOverflowError`.
+
+### 🧪 Модель без рендерера
+
+Тесты ядра **не требуют** OpenPDF, Apache POI или PDF-стека:
+
+```groovy
+def report = ReportDsl.report("R") {
+    bands { detail { textField(expression: "\$F{x}", width: 100f) } }
+}
+
+def ds = new CollectionReportDataSource([[x: 'a'], [x: 'b']])
+def rows = ReportFlattener.flatten(report, [:], ds)
+
+assert rows*.cells*.value.flatten() == ['a', 'b']
+```
+
+Это ускоряет тесты и позволяет разрабатывать модель независимо от рендереров.
+
+### 🧪 Fluent-фасад в стиле DynamicReports
+Для тех, кто предпочитает цепочки — модуль report-design-dynamicreports:
+
+```groovy
+report("CustomerReport")
+.columns(
+column("Item", "item", String),
+column("Quantity", "quantity", Integer)
+)
+.title("Getting started")
+.setDataSource(new CustomConfig("static", [rows: data]))
+.toPdf(out)
+```
+
+Строит тот же Report, что и блочный DSL. Рендеринг — через тот же RendererRegistry.
+
+### 🧪 Конвертер JRXML → DSL
+Модуль report-design-jasper-to-dsl мигрирует существующие шаблоны JasperReports:
+
+```bash
+mvn -pl report-design-jasper-to-dsl exec:java \
+-Dexec.args="report.jrxml report.groovy"
+```
+
+## Почему не JasperReports / DynamicReports
+
+| Аспект | JasperReports | report-design-lib |
+|---|---|---|
+| Формат шаблона | JRXML (XML) | Groovy DSL — проходит code review |
+| Источник данных | JRDataSource, JNDI | SPI — SQL, REST, Mongo, свой |
+| Формат вывода | PDF, XLS, HTML | PDF, XLSX, HTML, JSON + свой |
+| Тестирование | требует рендерера | модель без рендерера |
+| Зависимости ядра | JasperReports + OpenPDF | только Groovy |
+| Расширение | subreports, скриптлеты | SPI + модули |
+| Подотчёты | есть | есть, с защитой от циклов |
 
 ---
 
