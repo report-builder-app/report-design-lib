@@ -6,7 +6,7 @@
 
     <groupId>com.report_design</groupId>
     <artifactId>report-design-lib</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <packaging>pom</packaging>
     <modules>
         <module>report-design-core</module>
@@ -19,8 +19,8 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -43,7 +43,6 @@
 
     <build>
         <plugins>
-            <!-- GMavenPlus plugin to compile Groovy code -->
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
@@ -51,17 +50,24 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>addSources</goal>
-                            <goal>addTestSources</goal>
-                            <goal>generateStubs</goal>
                             <goal>compile</goal>
-                            <goal>generateTestStubs</goal>
                             <goal>compileTests</goal>
-                            <goal>removeStubs</goal>
-                            <goal>removeTestStubs</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <targetBytecode>17</targetBytecode>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <skipMain>true</skipMain>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
 
             <!-- Surefire plugin for running tests -->

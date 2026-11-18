@@ -6,15 +6,15 @@
     <parent>
         <groupId>com.report_design</groupId>
         <artifactId>report-design-lib</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </parent>
 
     <artifactId>report-design-renderer-pdf</artifactId>
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <groovy.version>4.0.31</groovy.version>
     </properties>
@@ -66,6 +66,7 @@
 
     <build>
         <plugins>
+            <!-- 1. GMavenPlus: полный цикл для совместной компиляции -->
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
@@ -73,25 +74,46 @@
                 <executions>
                     <execution>
                         <goals>
-                            <!-- Важно: compile компилирует .groovy И .java вместе -->
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
                             <goal>compile</goal>
                             <goal>compileTests</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <sources>
+                        <source>
+                            <directory>${project.basedir}/src/main/java</directory>
+                            <includes>
+                                <include>**/*.groovy</include>
+                                <include>**/*.java</include>
+                            </includes>
+                        </source>
+                    </sources>
+                    <testSources>
+                        <source>
+                            <directory>${project.basedir}/src/test/java</directory>
+                            <includes>
+                                <include>**/*.groovy</include>
+                                <include>**/*.java</include>
+                            </includes>
+                        </source>
+                    </testSources>
                     <targetBytecode>17</targetBytecode>
                 </configuration>
             </plugin>
 
-            <!-- Отключаем стандартный Java-компилятор, gmavenplus сделает всё -->
+            <!-- 2. Java Compiler: НЕ отключаем полностью, но настраиваем -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <skipMain>true</skipMain>
-                    <skip>true</skip>
+                    <!-- Важно: не ставить skipMain=true, иначе Java-классы (если есть) не скомпилируются -->
+                    <!-- GMavenPlus сам вызовет компилятор для Java-стабов -->
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
         </plugins>
