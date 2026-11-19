@@ -11,6 +11,23 @@ class DataSourceRegistry {
         providers[p.name] = p
     }
 
+    /** Получить провайдер по имени. */
+    static DataSourceProvider<?> get(String providerName) {
+        def p = providers[providerName]
+        if (!p) {
+            throw new IllegalStateException("No provider for '${providerName}'. Available: ${available()}")
+        }
+        p
+    }
+
+    static <C extends DataSourceConfig> DataSourceProvider<C> getTyped(String providerName, Class<C> type) {
+        def p = providers[providerName]
+        if (!p) throw new IllegalStateException("No provider for '${providerName}'")
+        if (!type.isAssignableFrom(p.configType))
+            throw new IllegalArgumentException("Provider '$providerName' expects ${p.configType.simpleName}, got ${type.simpleName}")
+        (DataSourceProvider<C>) p
+    }
+
     static ReportDataSource create(DataSourceConfig cfg, Map<String, Object> params) {
         def p = providers[cfg.providerName]
         if (!p) throw new IllegalStateException("No provider for '${cfg.providerName}'")
